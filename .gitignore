@@ -1,0 +1,60 @@
+# --- Секреты и конфигурация ---
+.env
+.env.local
+*.key
+*.pem
+secrets.json
+config.private.py
+
+# --- Виртуальное окружение Python ---
+venv/
+env/
+.venv/
+env.bak/
+
+# --- Кэш и временные файлы Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- IDE и редакторы ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Операционная система ---
+.DS_Store          (macOS)
+Thumbs.db          (Windows)
+desktop.ini
+
+# --- Логи и данные ---
+*.log
+logs/
+*.db               (SQLite базы)
+*.sqlite3
+data/
+uploads/
+
+# --- Графики и временные файлы ---
+*.png
+*.jpg
+*.jpeg
+plots/
