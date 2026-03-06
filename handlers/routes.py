@@ -1,0 +1,44 @@
+from aiogram import Router, F
+from aiogram.filters import Command
+from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+
+router = Router()
+
+def get_main_reply_keyboard():
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Регистрация")],
+            [KeyboardButton(text="На главную")]
+        ],
+        resize_keyboard=True
+    )
+    return keyboard
+
+def get_basic_reply_keyboard():
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Управление весом"),
+             KeyboardButton(text="Управление давлением")],
+            [KeyboardButton(text="Управление циклом"),
+            KeyboardButton(text="Управление питанием")]
+        ],
+        resize_keyboard=True
+    )
+
+    return keyboard
+
+
+
+@router.message(Command("start"))
+async def hello(message: Message):
+    await message.answer(
+        "hello",
+    parse_mode="Markdown",
+    reply_markup=get_main_reply_keyboard())
+
+@router.message(F.text=="На главную")
+async def basic(message: Message):
+    await message.answer(
+        "Выбери, что хочешь сделать",
+    parse_mode="Markdown",
+    reply_markup=get_basic_reply_keyboard())
