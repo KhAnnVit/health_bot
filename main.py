@@ -1,11 +1,11 @@
-from os import getenv
+from config import BOT_TOKEN
 import asyncio
 from aiogram import Bot, Dispatcher
-from dotenv import load_dotenv
 from handlers.routes import router
+import db
 
-load_dotenv()
-TOKEN = getenv("BOT_TOKEN")
+
+TOKEN = BOT_TOKEN
 
 dp = Dispatcher()
 dp.include_router(router)
@@ -13,9 +13,14 @@ dp.include_router(router)
 
 async def main():
     bot = Bot(token=TOKEN)
-
+    await db.init_db()  # ← Инициализация БД
+    print("🤖 Бот запущен!")
     await dp.start_polling(bot)
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n👋 Бот остановлен")
+        asyncio.run(db.close_db())
