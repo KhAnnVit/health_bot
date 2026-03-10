@@ -1,14 +1,17 @@
 from config import BOT_TOKEN
 import asyncio
 from aiogram import Bot, Dispatcher
-from handlers.routes import router
+from handlers import routes, weight, pressure, stats
 import db
 
 
 TOKEN = BOT_TOKEN
 
 dp = Dispatcher()
-dp.include_router(router)
+dp.include_router(routes.router)
+dp.include_router(weight.router)
+dp.include_router(pressure.router)
+dp.include_router(stats.router)
 
 
 async def main():

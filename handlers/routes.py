@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
+from aiogram.methods.answer_callback_query import AnswerCallbackQuery
 from forms.user import Form
 from aiogram.fsm.context import FSMContext
 import handlers.keyboards as kb
@@ -18,8 +19,20 @@ async def cmd_start(message: Message):
         "/pressure 120 80 70— записать давление и пульс\n"
         "/myweight — история веса\n"
         "/mypressure — история давления\n"
-        "/stats — статистика"
+        "/stats — статистика",
+        reply_markup=kb.get_basic_reply_keyboard()
     )
+@router.callback_query(F.data == 'basic_page')
+@router.message(F.text=="На главную")
+async def basic(message: Message, state: FSMContext, callback_query: CallbackQuery):
+    await message.answer(
+        "Выбери, что хочешь сделать",
+    parse_mode="Markdown",
+    reply_markup=kb.get_basic_reply_keyboard())
+    await callback_query.AnswerCallbackQuery("Выбери, что хочешь сделать", reply_markup=kb.get_basic_reply_keyboard())
+    await state.clear()
+
+
 
 
 @router.message(Command("weight"))
@@ -124,3 +137,4 @@ async def process_gender(callback: CallbackQuery, state: FSMContext):
     gender = data["gender"]
     await state.clear()
     await callback.message.answer(f"Отлично! Ваше имя : {name}, ваш возраст: {age}, ваш пол: {gender}")'''
+

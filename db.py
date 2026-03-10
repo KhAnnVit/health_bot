@@ -104,3 +104,32 @@ async def get_pressure_history(telegram_id, limit=10):
 async def close_db():
     if pool:
         await pool.close()
+
+
+
+async def get_weight_stats(telegram_id):
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("""
+            SELECT 
+                MIN(weight) as min_weight,
+                MAX(weight) as max_weight,
+                AVG(weight) as avg_weight,
+                COUNT(*) as total_records
+            FROM weight_logs
+            WHERE telegram_id = $1
+        """, telegram_id)
+        return dict(row) if row else {}
+
+async def get_pressure_stats(telegram_id):
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("""
+            SELECT 
+                MIN(systolic) as min_systolic,
+                MAX(systolic) as max_systolic,
+                MIN(diastolic) as min_diastolic,
+                MAX(diastolic) as max_diastolic,
+                COUNT(*) as total_records
+            FROM pressure_logs
+            WHERE telegram_id = $1
+        """, telegram_id)
+        return dict(row) if row else {}
