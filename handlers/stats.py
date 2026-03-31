@@ -1,8 +1,59 @@
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters import Command
+from aiogram.types import Message, CallbackQuery
+from aiogram.methods.answer_callback_query import AnswerCallbackQuery
 import db
+from utils import charts
+from aiogram.types import FSInputFile
+
+
 
 router = Router()
+
+@router.callback_query(F.data == 'weight_chart')
+async def cmd_weightchart(callback_query: CallbackQuery):
+    await callback_query.answer()
+    chart_file = await charts.generate_weight_chart(callback_query.from_user.id)
+
+    if not chart_file:
+        await callback_query.message.answer("📭 Нет данных для графика")
+        return
+
+    await callback_query.message.answer_photo(
+        photo=FSInputFile(chart_file),
+        caption="📊 Ваш график веса"
+    )
+
+'''
+@router.callback_query(F.data == 'basic_page')
+@router.message(F.text=="На главную")
+async def basic(message: Message, state: FSMContext, callback_query: CallbackQuery):
+    await message.answer(
+        "Выбери, что хочешь сделать",
+    parse_mode="Markdown",
+    reply_markup=kb.get_basic_reply_keyboard())
+    await callback_query.AnswerCallbackQuery("Выбери, что хочешь сделать", reply_markup=kb.get_basic_reply_keyboard())
+    await state.clear()'''
+
+@router.message(Command("pressurechart"))
+async def cmd_pressurechart(message: types.Message):
+    chart_file = await charts.generate_pressure_chart(message.from_user.id)
+
+    if not chart_file:
+        await message.answer("📭 Нет данных для графика")
+        return
+
+    await message.answer_photo(
+        photo=FSInputFile(chart_file),
+        caption="💓 Ваш график давления"
+    )
+
+
+
+
+
+
+
 
 @router.message(F.text=="Моя статистика")
 @router.message(Command("stats"))

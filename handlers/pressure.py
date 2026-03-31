@@ -10,7 +10,7 @@ router = Router()
 
 
 
-
+'''
 
 
 @router.message(F.text=="Записать давление")
@@ -102,3 +102,5 @@ async def cmd_mypressure(message: types.Message):
         text += f"• {date}: {systolic}/{diastolic}{pulse}{note}\n"
 
     await message.answer(text)
+
+'''

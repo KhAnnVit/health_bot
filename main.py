@@ -4,8 +4,13 @@ from aiogram import Bot, Dispatcher
 from handlers import routes, weight, pressure, stats
 import db
 
+# Для прокси
+from aiogram.client.bot import DefaultBotProperties
+from aiogram.enums import ParseMode
+from config import PROXY_URL
+from aiogram.client.session.aiohttp import AiohttpSession
 
-TOKEN = BOT_TOKEN
+#TOKEN = BOT_TOKEN
 
 dp = Dispatcher()
 dp.include_router(routes.router)
@@ -15,10 +20,21 @@ dp.include_router(stats.router)
 
 
 async def main():
-    bot = Bot(token=TOKEN)
-    await db.init_db()  # ← Инициализация БД
+    await db.init_db()
+
+    # Создаем сессию с параметром proxy
+    session = AiohttpSession(proxy=PROXY_URL)
+
+    # Передаем сессию в бота
+    bot = Bot(
+        token=BOT_TOKEN,
+        session=session,
+        session_default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    )
+
     print("🤖 Бот запущен!")
     await dp.start_polling(bot)
+
 
 
 if __name__ == '__main__':

@@ -1,6 +1,14 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 
+
+
+
+
+
+
+'''
+
 def get_gender_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -51,3 +59,23 @@ def get_start_inline_keyboard():
         ]
     )
     return keyboard
+
+def get_myweight_inline_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='График веса', callback_data='weight_chart')],
+            [InlineKeyboardButton(text='На главную', callback_data='basic_page')]
+        ]
+    )
+    return keyboard
+
+def get_mypressure_inline_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='График давления', callback_data='pressure_chart')],
+            [InlineKeyboardButton(text='На главную', callback_data='basic_page')]
+        ]
+    )
+    return keyboard
+
+'''

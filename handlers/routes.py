@@ -8,7 +8,7 @@ import handlers.keyboards as kb
 import db
 
 router = Router()
-
+'''
 @router.message(Command("start"))
 async def cmd_start(message: Message):
     await db.add_user(message.from_user.id, message.from_user.username)
@@ -85,7 +85,7 @@ async def cmd_deleteweight(message: types.Message):
 
 
 
-
+'''
 
 
 

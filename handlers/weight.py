@@ -1,13 +1,14 @@
 from aiogram import Router, F
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
+from aiogram.methods.answer_callback_query import AnswerCallbackQuery
 import db
 from forms.user import sets
 from aiogram.fsm.context import FSMContext
 import handlers.keyboards as kb
 
 router = Router()
-
+'''
 def isfloat(s: str,float):
     try:
         float(s)
@@ -78,11 +79,11 @@ async def cmd_myweight(message: Message):
         note = f" ({record['note']})" if record['note'] else ""
         text += f"• {date}: {weight} кг{note}\n"
 
-    await message.answer(text)
+    await message.answer(text, reply_markup=kb.get_myweight_inline_keyboard())
 
 
 @router.message(Command("deleteweight"))
 async def cmd_deleteweight(message: types.Message):
     # Пока просто заглушка - можно добавить позже
     await message.answer("🗑 Функция удаления в разработке")
-
+'''
