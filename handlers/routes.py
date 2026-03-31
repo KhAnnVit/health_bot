@@ -8,6 +8,25 @@ import handlers.keyboards as kb
 import db
 
 router = Router()
+
+@router.message(Command("start"))
+async def cmd_start(message: Message):
+    await db.add_user(message.from_user.id, message.from_user.username)
+    await message.answer(
+        "👋 Привет! Я бот для отслеживания здоровья.\n\n"
+        "Выбери, что хочешь сделать",
+        reply_markup=kb.get_main_reply_keyboard()
+    )
+
+@router.callback_query(F.data == 'go_to_basic_menu')
+async def basic(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.answer()
+    await callback_query.message.answer("Выбери, что хочешь сделать", reply_markup=kb.get_main_reply_keyboard())
+    await state.clear()
+
+
+
+
 '''
 @router.message(Command("start"))
 async def cmd_start(message: Message):

@@ -1,11 +1,46 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 
+def get_main_reply_keyboard():
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Записать вес"),
+             KeyboardButton(text="Записать давление")],
+            [KeyboardButton(text="Мой вес"),
+             KeyboardButton(text="Моё давление")],
+            [KeyboardButton(text="Моя статистика")]
+        ],
+        resize_keyboard=True
+    )
+    return keyboard
 
 
+def get_skip_inline_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='Вернуться на главную', callback_data='go_to_basic_menu')],
+        ]
+    )
+    return keyboard
 
 
+def get_myweight_inline_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='График веса', callback_data='weight_chart')],
+            [InlineKeyboardButton(text='На главную', callback_data='go_to_basic_menu')]
+        ]
+    )
+    return keyboard
 
+def get_myweight_inline_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='График веса', callback_data='pressure_chart')],
+            [InlineKeyboardButton(text='На главную', callback_data='go_to_basic_menu')]
+        ]
+    )
+    return keyboard
 
 '''
 

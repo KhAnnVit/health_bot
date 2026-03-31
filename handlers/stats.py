@@ -5,6 +5,7 @@ from aiogram.methods.answer_callback_query import AnswerCallbackQuery
 import db
 from utils import charts
 from aiogram.types import FSInputFile
+import handlers.keyboards as kb
 
 
 
@@ -34,19 +35,20 @@ async def basic(message: Message, state: FSMContext, callback_query: CallbackQue
     reply_markup=kb.get_basic_reply_keyboard())
     await callback_query.AnswerCallbackQuery("Выбери, что хочешь сделать", reply_markup=kb.get_basic_reply_keyboard())
     await state.clear()'''
-
+@router.callback_query(F.data == 'pressure_chart')
 @router.message(Command("pressurechart"))
-async def cmd_pressurechart(message: types.Message):
-    chart_file = await charts.generate_pressure_chart(message.from_user.id)
+async def cmd_pressurechart(callback_query: CallbackQuery):
+    await callback_query.answer()
+    chart_file = await charts.generate_pressure_chart(callback_query.message.from_user.id)
 
     if not chart_file:
-        await message.answer("📭 Нет данных для графика")
+        await callback_query.message.answer("📭 Нет данных для графика", reply_markup=kb.get_skip_inline_keyboard())
         return
 
-    await message.answer_photo(
+    await callback_query.message.answer_photo(
         photo=FSInputFile(chart_file),
-        caption="💓 Ваш график давления"
-    )
+        caption="💓 Ваш график давления")
+    await callback_query.message.answer(reply_markup=kb.get_skip_inline_keyboard())
 
 
 
