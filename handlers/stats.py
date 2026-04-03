@@ -4,26 +4,68 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.methods.answer_callback_query import AnswerCallbackQuery
 import db
 from utils import charts
-from aiogram.types import FSInputFile
+from aiogram.types import FSInputFile, BufferedInputFile
 import handlers.keyboards as kb
+from utils import reports as report
+from datetime import datetime
 
 
 
 router = Router()
-
+'''
 @router.callback_query(F.data == 'weight_chart')
 async def cmd_weightchart(callback_query: CallbackQuery):
     await callback_query.answer()
-    chart_file = await charts.generate_weight_chart(callback_query.from_user.id)
+    chart_buffer = await charts.generate_weight_chart_bytes(
+        callback_query.from_user.id
+    )
 
-    if not chart_file:
-        await callback_query.message.answer("📭 Нет данных для графика")
+    if not chart_buffer:
+        await callback_query.message.answer("📭 Нет данных для графика", reply_markup=kb.get_skip_inline_keyboard())
         return
 
+
     await callback_query.message.answer_photo(
-        photo=FSInputFile(chart_file),
-        caption="📊 Ваш график веса"
+        photo=BufferedInputFile(
+            file=chart_buffer.getvalue(),  # Берём байты из памяти
+            filename="weight.png"           # Имя файла (для Телеграма)
+        ),
+        caption="📊 Ваш вес (последние записи)",
+        reply_markup=kb.get_skip_inline_keyboard()
     )
+'''
+
+
+@router.callback_query(F.data == 'weight_chart')
+async def cmd_weightchart(callback_query: CallbackQuery):
+    print(f"🔍 Запрос графика от пользователя {callback_query.from_user.id}")
+
+    await callback_query.answer()
+
+    chart_buffer = await charts.generate_weight_chart_bytes(
+        callback_query.from_user.id
+    )
+
+    print(f"📊 Результат функции: {chart_buffer}")  # ← Покажет None или объект
+
+    if not chart_buffer:
+        print("⚠️ График не создан (нет данных или ошибка)")
+        await callback_query.message.answer(
+            "📭 Нет данных для графика",
+            reply_markup=kb.get_skip_inline_keyboard()
+        )
+        return
+
+    print("✅ Отправляем график...")
+    await callback_query.message.answer_photo(
+        photo=BufferedInputFile(
+            file=chart_buffer.getvalue(),
+            filename="weight.png"
+        ),
+        caption="📊 Ваш вес (последние записи)",
+        reply_markup=kb.get_skip_inline_keyboard()
+    )
+    print("✅ График отправлен!")
 
 '''
 @router.callback_query(F.data == 'basic_page')
@@ -35,11 +77,14 @@ async def basic(message: Message, state: FSMContext, callback_query: CallbackQue
     reply_markup=kb.get_basic_reply_keyboard())
     await callback_query.AnswerCallbackQuery("Выбери, что хочешь сделать", reply_markup=kb.get_basic_reply_keyboard())
     await state.clear()'''
+
+'''
 @router.callback_query(F.data == 'pressure_chart')
-@router.message(Command("pressurechart"))
 async def cmd_pressurechart(callback_query: CallbackQuery):
     await callback_query.answer()
-    chart_file = await charts.generate_pressure_chart(callback_query.message.from_user.id)
+    print(f"🔍 Запрос графика давления от {callback_query.from_user.id}")
+    
+    chart_file = await charts.generate_pressure_chart_bytes(callback_query.message.from_user.id)
 
     if not chart_file:
         await callback_query.message.answer("📭 Нет данных для графика", reply_markup=kb.get_skip_inline_keyboard())
@@ -48,12 +93,34 @@ async def cmd_pressurechart(callback_query: CallbackQuery):
     await callback_query.message.answer_photo(
         photo=FSInputFile(chart_file),
         caption="💓 Ваш график давления")
-    await callback_query.message.answer(reply_markup=kb.get_skip_inline_keyboard())
+    await callback_query.message.answer(reply_markup=kb.get_skip_inline_keyboard())'''
 
 
+@router.callback_query(F.data == 'pressure_chart')
+async def cmd_pressurechart(callback_query: CallbackQuery):
+    await callback_query.answer()
 
+    chart_buffer = await charts.generate_pressure_chart_bytes(
+        callback_query.from_user.id
+    )
 
+    if not chart_buffer:
+        await callback_query.message.answer(
+            "📭 Нет данных для графика",
+            reply_markup=kb.get_skip_inline_keyboard()
+        )
+        return
 
+    await callback_query.message.answer_photo(
+        photo=BufferedInputFile(
+            file=chart_buffer.getvalue(),
+            filename="pressure.png"
+        ),
+        caption="💓 Ваше давление (верхнее / нижнее)",
+        reply_markup=kb.get_skip_inline_keyboard()
+    )
+
+'''
 
 
 
@@ -82,4 +149,58 @@ async def cmd_stats(message: types.Message):
     else:
         text += "💓 Давление: нет данных\n"
 
-    await message.answer(text)
+    await message.answer(text)'''
+
+
+# Отчёт по весу
+@router.callback_query(F.data == 'weight_report')
+async def cmd_download_weight_report(callback_query: CallbackQuery):
+    await callback_query.answer()
+
+    report_buffer = await report.generate_weight_report(
+        callback_query.from_user.id
+        # ← Убрали username
+    )
+
+    if not report_buffer:
+        await callback_query.message.answer(
+            "📭 Нет данных для отчёта по весу.\n\nДобавьте хотя бы одну запись: /weight 70.5",
+            reply_markup=kb.get_skip_inline_keyboard()
+        )
+        return
+
+    await callback_query.message.answer_document(
+        document=BufferedInputFile(
+            file=report_buffer.getvalue(),
+            filename=f"weight_report_{datetime.now().strftime('%Y%m%d')}.pdf"
+        ),
+        caption="⚖️ Отчёт по весу для врача\n\nВключает:\n• Средний, мин, макс вес\n• Изменение за период\n• Полную историю записей",
+        reply_markup=kb.get_skip_inline_keyboard()
+    )
+
+
+# Отчёт по давлению
+@router.callback_query(F.data == 'pressure_report')
+async def cmd_download_pressure_report(callback_query: CallbackQuery):
+    await callback_query.answer()
+
+    report_buffer = await report.generate_pressure_report(
+        callback_query.from_user.id
+        # ← Убрали username
+    )
+
+    if not report_buffer:
+        await callback_query.message.answer(
+            "📭 Нет данных для отчёта по давлению.\n\nДобавьте хотя бы одну запись: /pressure 120 80 75",
+            reply_markup=kb.get_skip_inline_keyboard()
+        )
+        return
+
+    await callback_query.message.answer_document(
+        document=BufferedInputFile(
+            file=report_buffer.getvalue(),
+            filename=f"pressure_report_{datetime.now().strftime('%Y%m%d')}.pdf"
+        ),
+        caption="💓 Отчёт по давлению и пульсу для врача\n\nВключает:\n• Среднее, мин, макс давление\n• Статистику по пульсу\n• Полную историю записей",
+        reply_markup=kb.get_skip_inline_keyboard()
+    )

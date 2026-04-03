@@ -28,15 +28,17 @@ def get_myweight_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text='График веса', callback_data='weight_chart')],
+            [InlineKeyboardButton(text='Отчёт для врача', callback_data='weight_report')],
             [InlineKeyboardButton(text='На главную', callback_data='go_to_basic_menu')]
         ]
     )
     return keyboard
 
-def get_myweight_inline_keyboard():
+def get_mypressure_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text='График веса', callback_data='pressure_chart')],
+            [InlineKeyboardButton(text='График давления', callback_data='pressure_chart')],
+            [InlineKeyboardButton(text='Отчёт для врача', callback_data='pressure_report')],
             [InlineKeyboardButton(text='На главную', callback_data='go_to_basic_menu')]
         ]
     )

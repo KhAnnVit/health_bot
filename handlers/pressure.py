@@ -62,7 +62,7 @@ async def mypressure(message: Message):
         note = f" ({record['note']})" if record['note'] else ""
         text += f"• {date}: {systolic}/{diastolic}{pulse}{note}\n"
 
-    await message.answer(text, reply_markup=kb.get_skip_inline_keyboard())
+    await message.answer(text, reply_markup=kb.get_mypressure_inline_keyboard())
 
 
 '''
