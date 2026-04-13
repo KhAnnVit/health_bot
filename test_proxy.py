@@ -2,7 +2,6 @@ import asyncio
 from aiohttp_socks import ProxyConnector
 from aiohttp import ClientSession
 from config import PROXY_URL
-# ВСТАВЬТЕ СЮДА ВАШУ НОВУЮ ССЫЛКУ
 
 
 async def test_proxy():

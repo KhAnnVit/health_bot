@@ -10,15 +10,14 @@ from aiogram.enums import ParseMode
 from config import PROXY_URL
 from aiogram.client.session.aiohttp import AiohttpSession
 
-#TOKEN = BOT_TOKEN
-
+#Подключаем модули
 dp = Dispatcher()
 dp.include_router(routes.router)
 dp.include_router(weight.router)
 dp.include_router(pressure.router)
 dp.include_router(stats.router)
 
-
+#Функция по запуску бота
 async def main():
     await db.init_db()
 

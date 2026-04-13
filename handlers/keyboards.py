@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
-
+#основная клавиатура
 def get_main_reply_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -14,7 +14,7 @@ def get_main_reply_keyboard():
     )
     return keyboard
 
-
+#клавиатура для возврата к основной клавиатуре
 def get_skip_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -23,7 +23,7 @@ def get_skip_inline_keyboard():
     )
     return keyboard
 
-
+#клавиатура для просмотра веса
 def get_myweight_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -34,6 +34,7 @@ def get_myweight_inline_keyboard():
     )
     return keyboard
 
+#клавиатура для просмотра давления
 def get_mypressure_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -43,76 +44,3 @@ def get_mypressure_inline_keyboard():
         ]
     )
     return keyboard
-
-'''
-
-def get_gender_inline_keyboard():
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text='Мужчина', callback_data='man'), InlineKeyboardButton(text='Женщина', callback_data='woman')],
-        ]
-    )
-    return keyboard
-
-
-
-def get_main_reply_keyboard():
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Регистрация")],
-            [KeyboardButton(text="На главную")]
-        ],
-        resize_keyboard=True
-    )
-    return keyboard
-
-def get_basic_reply_keyboard():
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Записать вес"),
-             KeyboardButton(text="Записать давление")],
-            [KeyboardButton(text="Мой вес"),
-            KeyboardButton(text="Моё давление")],
-            [KeyboardButton(text="Моя статистика")]
-        ],
-        resize_keyboard=True
-    )
-
-    return keyboard
-
-def get_basic_inline_keyboard():
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text='Записать вес', callback_data='set_weight')]
-        ]
-    )
-    return keyboard
-
-
-def get_start_inline_keyboard():
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text='На главную', callback_data='basic_page')]
-        ]
-    )
-    return keyboard
-
-def get_myweight_inline_keyboard():
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text='График веса', callback_data='weight_chart')],
-            [InlineKeyboardButton(text='На главную', callback_data='basic_page')]
-        ]
-    )
-    return keyboard
-
-def get_mypressure_inline_keyboard():
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text='График давления', callback_data='pressure_chart')],
-            [InlineKeyboardButton(text='На главную', callback_data='basic_page')]
-        ]
-    )
-    return keyboard
-
-'''

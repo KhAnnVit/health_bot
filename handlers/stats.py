@@ -9,54 +9,23 @@ import handlers.keyboards as kb
 from utils import reports as report
 from datetime import datetime
 
-
-
 router = Router()
-'''
-@router.callback_query(F.data == 'weight_chart')
-async def cmd_weightchart(callback_query: CallbackQuery):
-    await callback_query.answer()
-    chart_buffer = await charts.generate_weight_chart_bytes(
-        callback_query.from_user.id
-    )
-
-    if not chart_buffer:
-        await callback_query.message.answer("📭 Нет данных для графика", reply_markup=kb.get_skip_inline_keyboard())
-        return
-
-
-    await callback_query.message.answer_photo(
-        photo=BufferedInputFile(
-            file=chart_buffer.getvalue(),  # Берём байты из памяти
-            filename="weight.png"           # Имя файла (для Телеграма)
-        ),
-        caption="📊 Ваш вес (последние записи)",
-        reply_markup=kb.get_skip_inline_keyboard()
-    )
-'''
-
 
 @router.callback_query(F.data == 'weight_chart')
 async def cmd_weightchart(callback_query: CallbackQuery):
-    print(f"🔍 Запрос графика от пользователя {callback_query.from_user.id}")
-
     await callback_query.answer()
 
     chart_buffer = await charts.generate_weight_chart_bytes(
         callback_query.from_user.id
     )
 
-    print(f"📊 Результат функции: {chart_buffer}")  # ← Покажет None или объект
-
     if not chart_buffer:
-        print("⚠️ График не создан (нет данных или ошибка)")
         await callback_query.message.answer(
             "📭 Нет данных для графика",
             reply_markup=kb.get_skip_inline_keyboard()
         )
         return
 
-    print("✅ Отправляем график...")
     await callback_query.message.answer_photo(
         photo=BufferedInputFile(
             file=chart_buffer.getvalue(),
@@ -65,35 +34,8 @@ async def cmd_weightchart(callback_query: CallbackQuery):
         caption="📊 Ваш вес (последние записи)",
         reply_markup=kb.get_skip_inline_keyboard()
     )
-    print("✅ График отправлен!")
 
-'''
-@router.callback_query(F.data == 'basic_page')
-@router.message(F.text=="На главную")
-async def basic(message: Message, state: FSMContext, callback_query: CallbackQuery):
-    await message.answer(
-        "Выбери, что хочешь сделать",
-    parse_mode="Markdown",
-    reply_markup=kb.get_basic_reply_keyboard())
-    await callback_query.AnswerCallbackQuery("Выбери, что хочешь сделать", reply_markup=kb.get_basic_reply_keyboard())
-    await state.clear()'''
 
-'''
-@router.callback_query(F.data == 'pressure_chart')
-async def cmd_pressurechart(callback_query: CallbackQuery):
-    await callback_query.answer()
-    print(f"🔍 Запрос графика давления от {callback_query.from_user.id}")
-    
-    chart_file = await charts.generate_pressure_chart_bytes(callback_query.message.from_user.id)
-
-    if not chart_file:
-        await callback_query.message.answer("📭 Нет данных для графика", reply_markup=kb.get_skip_inline_keyboard())
-        return
-
-    await callback_query.message.answer_photo(
-        photo=FSInputFile(chart_file),
-        caption="💓 Ваш график давления")
-    await callback_query.message.answer(reply_markup=kb.get_skip_inline_keyboard())'''
 
 
 @router.callback_query(F.data == 'pressure_chart')
@@ -120,12 +62,8 @@ async def cmd_pressurechart(callback_query: CallbackQuery):
         reply_markup=kb.get_skip_inline_keyboard()
     )
 
-'''
-
-
 
 @router.message(F.text=="Моя статистика")
-@router.message(Command("stats"))
 async def cmd_stats(message: types.Message):
     weight_stats = await db.get_weight_stats(message.from_user.id)
     pressure_stats = await db.get_pressure_stats(message.from_user.id)
@@ -149,7 +87,7 @@ async def cmd_stats(message: types.Message):
     else:
         text += "💓 Давление: нет данных\n"
 
-    await message.answer(text)'''
+    await message.answer(text)
 
 
 # Отчёт по весу
@@ -159,7 +97,6 @@ async def cmd_download_weight_report(callback_query: CallbackQuery):
 
     report_buffer = await report.generate_weight_report(
         callback_query.from_user.id
-        # ← Убрали username
     )
 
     if not report_buffer:
@@ -186,7 +123,6 @@ async def cmd_download_pressure_report(callback_query: CallbackQuery):
 
     report_buffer = await report.generate_pressure_report(
         callback_query.from_user.id
-        # ← Убрали username
     )
 
     if not report_buffer:

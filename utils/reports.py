@@ -1,19 +1,16 @@
-# utils/report.py
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont  # ← Добавили импорт шрифтов
+from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
 from datetime import datetime
 import db
 import os
 
-# ============================================
-# 🅰️ РЕГИСТРАЦИЯ ШРИФТА С КИРИЛЛИЦЕЙ
-# ============================================
+
 # Путь к папке со шрифтами (относительно проекта)
 FONTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'fonts')
 
@@ -22,9 +19,7 @@ pdfmetrics.registerFont(TTFont('DejaVu', os.path.join(FONTS_DIR, 'DejaVuSans.ttf
 pdfmetrics.registerFont(TTFont('DejaVu-Bold', os.path.join(FONTS_DIR, 'DejaVuSans-Bold.ttf')))
 
 
-# ============================================
-# ⚖️ ОТЧЁТ ПО ВЕСУ
-# ============================================
+# отчёт по весу
 async def generate_weight_report(telegram_id: int):
     weight_history = await db.get_weight_history(telegram_id, limit=1000)
 
