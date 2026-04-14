@@ -1,4 +1,3 @@
-
 import asyncpg
 from config import DATABASE_URL
 from typing import List, Optional, Dict
@@ -52,52 +51,77 @@ async def init_db():
 
 async def add_user(telegram_id, username):
     async with pool.acquire() as conn:
-        await conn.execute("""
+        await conn.execute(
+            """
             INSERT INTO users (telegram_id, username)
             VALUES ($1, $2)
             ON CONFLICT (telegram_id) DO UPDATE SET username = $2
-        """, telegram_id, username)
+        """,
+            telegram_id,
+            username,
+        )
 
 
 async def add_weight(telegram_id, weight, note=None):
     async with pool.acquire() as conn:
         await add_user(telegram_id, "")
-        await conn.execute("""
+        await conn.execute(
+            """
             INSERT INTO weight_logs (telegram_id, weight, note)
             VALUES ($1, $2, $3)
-        """, telegram_id, weight, note)
+        """,
+            telegram_id,
+            weight,
+            note,
+        )
 
 
-async def add_pressure(telegram_id, systolic, diastolic, pulse=None, note=None):
+async def add_pressure(telegram_id, systolic, diastolic,
+                       pulse=None, note=None):
     async with pool.acquire() as conn:
         await add_user(telegram_id, "")
-        await conn.execute("""
+        await conn.execute(
+            """
             INSERT INTO pressure_logs (telegram_id, systolic, diastolic, pulse, note)
             VALUES ($1, $2, $3, $4, $5)
-        """, telegram_id, systolic, diastolic, pulse, note)
+        """,
+            telegram_id,
+            systolic,
+            diastolic,
+            pulse,
+            note,
+        )
 
 
 async def get_weight_history(telegram_id, limit=10):
     async with pool.acquire() as conn:
-        rows = await conn.fetch("""
+        rows = await conn.fetch(
+            """
             SELECT weight, recorded_at, note
             FROM weight_logs
             WHERE telegram_id = $1
             ORDER BY recorded_at DESC
             LIMIT $2
-        """, telegram_id, limit)
+        """,
+            telegram_id,
+            limit,
+        )
         return [dict(row) for row in rows]
 
 
 async def get_pressure_history(telegram_id, limit=10):
     async with pool.acquire() as conn:
-        rows = await conn.fetch("""
+        rows = await conn.fetch(
+            """
             SELECT systolic, diastolic, pulse, recorded_at, note
             FROM pressure_logs
             WHERE telegram_id = $1
             ORDER BY recorded_at DESC
             LIMIT $2
-        """, telegram_id, limit)
+        """,
+            telegram_id,
+            limit,
+        )
         return [dict(row) for row in rows]
 
 
@@ -106,24 +130,28 @@ async def close_db():
         await pool.close()
 
 
-
 async def get_weight_stats(telegram_id):
     async with pool.acquire() as conn:
-        row = await conn.fetchrow("""
-            SELECT 
+        row = await conn.fetchrow(
+            """
+            SELECT
                 MIN(weight) as min_weight,
                 MAX(weight) as max_weight,
                 AVG(weight) as avg_weight,
                 COUNT(*) as total_records
             FROM weight_logs
             WHERE telegram_id = $1
-        """, telegram_id)
+        """,
+            telegram_id,
+        )
         return dict(row) if row else {}
+
 
 async def get_pressure_stats(telegram_id):
     async with pool.acquire() as conn:
-        row = await conn.fetchrow("""
-            SELECT 
+        row = await conn.fetchrow(
+            """
+            SELECT
                 MIN(systolic) as min_systolic,
                 MAX(systolic) as max_systolic,
                 MIN(diastolic) as min_diastolic,
@@ -131,5 +159,7 @@ async def get_pressure_stats(telegram_id):
                 COUNT(*) as total_records
             FROM pressure_logs
             WHERE telegram_id = $1
-        """, telegram_id)
+        """,
+            telegram_id,
+        )
         return dict(row) if row else {}

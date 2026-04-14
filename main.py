@@ -10,14 +10,15 @@ from aiogram.enums import ParseMode
 from config import PROXY_URL
 from aiogram.client.session.aiohttp import AiohttpSession
 
-#Подключаем модули
+# Подключаем модули
 dp = Dispatcher()
 dp.include_router(routes.router)
 dp.include_router(weight.router)
 dp.include_router(pressure.router)
 dp.include_router(stats.router)
 
-#Функция по запуску бота
+
+# Функция по запуску бота
 async def main():
     await db.init_db()
 
@@ -28,15 +29,14 @@ async def main():
     bot = Bot(
         token=BOT_TOKEN,
         session=session,
-        session_default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+        session_default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
 
     print("🤖 Бот запущен!")
     await dp.start_polling(bot)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

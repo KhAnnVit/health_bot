@@ -5,18 +5,25 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.styles import ParagraphStyle
 from io import BytesIO
 from datetime import datetime
 import db
 import os
 
-
 # Путь к папке со шрифтами (относительно проекта)
-FONTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'fonts')
+FONTS_DIR = os.path.join(os.path.dirname(__file__), "..", "fonts")
 
 # Регистрируем шрифт DejaVu Sans (поддерживает русский)
-pdfmetrics.registerFont(TTFont('DejaVu', os.path.join(FONTS_DIR, 'DejaVuSans.ttf')))
-pdfmetrics.registerFont(TTFont('DejaVu-Bold', os.path.join(FONTS_DIR, 'DejaVuSans-Bold.ttf')))
+pdfmetrics.registerFont(
+    TTFont(
+        "DejaVu",
+        os.path.join(
+            FONTS_DIR,
+            "DejaVuSans.ttf")))
+pdfmetrics.registerFont(
+    TTFont("DejaVu-Bold", os.path.join(FONTS_DIR, "DejaVuSans-Bold.ttf"))
+)
 
 
 # отчёт по весу
@@ -35,45 +42,47 @@ async def generate_weight_report(telegram_id: int):
         rightMargin=2 * cm,
         leftMargin=2 * cm,
         topMargin=2 * cm,
-        bottomMargin=2 * cm
+        bottomMargin=2 * cm,
     )
 
     styles = getSampleStyleSheet()
 
     # ⭐ Создаём свои стили с кириллическим шрифтом
-    from reportlab.lib.styles import ParagraphStyle
 
     title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontName='DejaVu-Bold',  # ← Используем наш шрифт
+        "CustomTitle",
+        parent=styles["Heading1"],
+        fontName="DejaVu-Bold",  # ← Используем наш шрифт
         fontSize=16,
-        spaceAfter=12
+        spaceAfter=12,
     )
 
     subtitle_style = ParagraphStyle(
-        'CustomSubtitle',
-        parent=styles['Heading2'],
-        fontName='DejaVu-Bold',  # ← Используем наш шрифт
+        "CustomSubtitle",
+        parent=styles["Heading2"],
+        fontName="DejaVu-Bold",  # ← Используем наш шрифт
         fontSize=12,
-        spaceAfter=10
+        spaceAfter=10,
     )
 
     normal_style = ParagraphStyle(
-        'CustomNormal',
-        parent=styles['Normal'],
-        fontName='DejaVu',  # ← Используем наш шрифт
-        fontSize=10
+        "CustomNormal",
+        parent=styles["Normal"],
+        fontName="DejaVu",  # ← Используем наш шрифт
+        fontSize=10,
     )
 
     elements = []
 
     # Заголовок
-    elements.append(Paragraph("Отчёт по весу", title_style))  # ← Убрали эмодзи (могут не работать)
+    elements.append(
+        Paragraph("Отчёт по весу", title_style)
+    )  # ← Убрали эмодзи (могут не работать)
     elements.append(Spacer(1, 0.5 * cm))
 
     # Дата формирования
-    date_info = f"<b>Дата формирования:</b> {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+    date_info = f"<b>Дата формирования:</b> {
+        datetime.now().strftime('%d.%m.%Y %H:%M')}"
     elements.append(Paragraph(date_info, normal_style))
     elements.append(Spacer(1, 1 * cm))
 
@@ -92,24 +101,36 @@ async def generate_weight_report(telegram_id: int):
     ]
 
     stats_table = Table(stats_data, colWidths=[5 * cm, 3 * cm])
-    stats_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6c5ce7')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'DejaVu-Bold'),  # ← Наш шрифт
-        ('FONTSIZE', (0, 0), (-1, 0), 11),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
-        ('FONTNAME', (0, 1), (-1, -1), 'DejaVu'),  # ← Наш шрифт для данных
-    ]))
+    stats_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#6c5ce7")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "DejaVu-Bold"),  # ← Наш шрифт
+                ("FONTSIZE", (0, 0), (-1, 0), 11),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
+                ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#f8f9fa")),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [colors.white, colors.HexColor("#f8f9fa")],
+                ),
+                # ← Наш шрифт для данных
+                ("FONTNAME", (0, 1), (-1, -1), "DejaVu"),
+            ]
+        )
+    )
 
     elements.append(stats_table)
     elements.append(Spacer(1, 1 * cm))
 
     # Детальные записи
-    elements.append(Paragraph(f"Полная история ({len(weights)} записей):", subtitle_style))
+    elements.append(
+        Paragraph(f"Полная история ({len(weights)} записей):", subtitle_style)
+    )
     elements.append(Spacer(1, 0.3 * cm))
 
     weight_rows = [["Дата и время", "Вес (кг)"]]
@@ -118,16 +139,26 @@ async def generate_weight_report(telegram_id: int):
         weight_rows.append([date, f"{record['weight']}"])
 
     weight_table = Table(weight_rows, colWidths=[5 * cm, 2 * cm])
-    weight_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6c5ce7')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'DejaVu-Bold'),  # ← Наш шрифт
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('FONTNAME', (0, 1), (-1, -1), 'DejaVu'),  # ← Наш шрифт для данных
-    ]))
+    weight_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#6c5ce7")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "DejaVu-Bold"),  # ← Наш шрифт
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [colors.white, colors.HexColor("#f8f9fa")],
+                ),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                # ← Наш шрифт для данных
+                ("FONTNAME", (0, 1), (-1, -1), "DejaVu"),
+            ]
+        )
+    )
 
     elements.append(weight_table)
     elements.append(Spacer(1, 1 * cm))
@@ -165,44 +196,42 @@ async def generate_pressure_report(telegram_id: int):
         rightMargin=2 * cm,
         leftMargin=2 * cm,
         topMargin=2 * cm,
-        bottomMargin=2 * cm
+        bottomMargin=2 * cm,
     )
 
     styles = getSampleStyleSheet()
 
-    from reportlab.lib.styles import ParagraphStyle
-
     title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontName='DejaVu-Bold',
+        "CustomTitle",
+        parent=styles["Heading1"],
+        fontName="DejaVu-Bold",
         fontSize=16,
-        spaceAfter=12
+        spaceAfter=12,
     )
 
     subtitle_style = ParagraphStyle(
-        'CustomSubtitle',
-        parent=styles['Heading2'],
-        fontName='DejaVu-Bold',
+        "CustomSubtitle",
+        parent=styles["Heading2"],
+        fontName="DejaVu-Bold",
         fontSize=12,
-        spaceAfter=10
+        spaceAfter=10,
     )
 
     normal_style = ParagraphStyle(
-        'CustomNormal',
-        parent=styles['Normal'],
-        fontName='DejaVu',
-        fontSize=10
+        "CustomNormal", parent=styles["Normal"], fontName="DejaVu", fontSize=10
     )
 
     elements = []
 
     # Заголовок
-    elements.append(Paragraph("Отчёт по давлению и пульсу", title_style))  # ← Убрали эмодзи
+    elements.append(
+        Paragraph("Отчёт по давлению и пульсу", title_style)
+    )  # ← Убрали эмодзи
     elements.append(Spacer(1, 0.5 * cm))
 
     # Дата
-    date_info = f"<b>Дата формирования:</b> {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+    date_info = f"<b>Дата формирования:</b> {
+        datetime.now().strftime('%d.%m.%Y %H:%M')}"
     elements.append(Paragraph(date_info, normal_style))
     elements.append(Spacer(1, 1 * cm))
 
@@ -214,7 +243,11 @@ async def generate_pressure_report(telegram_id: int):
     stats_data = [
         ["Показатель", "Верхнее", "Нижнее"],
         ["Всего записей", str(len(systolic)), str(len(diastolic))],
-        ["Среднее", f"{sum(systolic) / len(systolic):.0f}", f"{sum(diastolic) / len(diastolic):.0f}"],
+        [
+            "Среднее",
+            f"{sum(systolic) / len(systolic):.0f}",
+            f"{sum(diastolic) / len(diastolic):.0f}",
+        ],
         ["Минимальное", f"{min(systolic)}", f"{min(diastolic)}"],
         ["Максимальное", f"{max(systolic)}", f"{max(diastolic)}"],
         ["Первая запись", f"{systolic[0]}", f"{diastolic[0]}"],
@@ -222,48 +255,83 @@ async def generate_pressure_report(telegram_id: int):
     ]
 
     if pulse:
-        stats_data.append(["Пульс (средний)", f"{sum(pulse) / len(pulse):.0f} уд/мин", "-"])
+        stats_data.append(
+            ["Пульс (средний)", f"{sum(pulse) / len(pulse):.0f} уд/мин", "-"]
+        )
         stats_data.append(["Пульс (мин)", f"{min(pulse)} уд/мин", "-"])
         stats_data.append(["Пульс (макс)", f"{max(pulse)} уд/мин", "-"])
 
     stats_table = Table(stats_data, colWidths=[4 * cm, 2.5 * cm, 2.5 * cm])
-    stats_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e74c3c')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'DejaVu-Bold'),  # ← Наш шрифт
-        ('FONTSIZE', (0, 0), (-1, 0), 11),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
-        ('FONTNAME', (0, 1), (-1, -1), 'DejaVu'),  # ← Наш шрифт для данных
-    ]))
+    stats_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e74c3c")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "DejaVu-Bold"),  # ← Наш шрифт
+                ("FONTSIZE", (0, 0), (-1, 0), 11),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
+                ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#f8f9fa")),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [colors.white, colors.HexColor("#f8f9fa")],
+                ),
+                # ← Наш шрифт для данных
+                ("FONTNAME", (0, 1), (-1, -1), "DejaVu"),
+            ]
+        )
+    )
 
     elements.append(stats_table)
     elements.append(Spacer(1, 1 * cm))
 
     # Детальные записи
-    elements.append(Paragraph(f"Полная история ({len(pressure_history)} записей):", subtitle_style))
+    elements.append(
+        Paragraph(
+            f"Полная история ({
+                len(pressure_history)} записей):",
+            subtitle_style)
+    )
     elements.append(Spacer(1, 0.3 * cm))
 
     pressure_rows = [["Дата и время", "Верхнее", "Нижнее", "Пульс"]]
     for record in reversed(pressure_history):
         date = record["recorded_at"].strftime("%d.%m.%Y %H:%M")
-        pulse_val = str(record.get("pulse", "-")) if record.get("pulse") else "-"
-        pressure_rows.append([date, str(record["systolic"]), str(record["diastolic"]), pulse_val])
+        pulse_val = str(
+            record.get(
+                "pulse",
+                "-")) if record.get("pulse") else "-"
+        pressure_rows.append(
+            [date, str(record["systolic"]), str(
+                record["diastolic"]), pulse_val]
+        )
 
-    pressure_table = Table(pressure_rows, colWidths=[4 * cm, 2 * cm, 2 * cm, 2 * cm])
-    pressure_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e74c3c')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'DejaVu-Bold'),  # ← Наш шрифт
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('FONTNAME', (0, 1), (-1, -1), 'DejaVu'),  # ← Наш шрифт для данных
-    ]))
+    pressure_table = Table(
+        pressure_rows, colWidths=[
+            4 * cm, 2 * cm, 2 * cm, 2 * cm])
+    pressure_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e74c3c")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "DejaVu-Bold"),  # ← Наш шрифт
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                (
+                    "ROWBACKGROUNDS",
+                    (0, 1),
+                    (-1, -1),
+                    [colors.white, colors.HexColor("#f8f9fa")],
+                ),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                # ← Наш шрифт для данных
+                ("FONTNAME", (0, 1), (-1, -1), "DejaVu"),
+            ]
+        )
+    )
 
     elements.append(pressure_table)
     elements.append(Spacer(1, 1 * cm))

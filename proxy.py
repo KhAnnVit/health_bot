@@ -1,5 +1,6 @@
 from urllib.parse import urlparse, parse_qs, unquote
 from config import PROXY_URL
+
 # Ваша ссылка от Telegram
 tg_proxy = PROXY_URL
 
@@ -8,10 +9,10 @@ parsed = urlparse(tg_proxy)
 params = parse_qs(parsed.query)
 
 # Извлекаем данные
-server = params['server'][0]
-port = params['port'][0]
-user = unquote(params.get('user', [None])[0])  # unquote декодирует %20 и т.п.
-password = unquote(params.get('pass', [None])[0])
+server = params["server"][0]
+port = params["port"][0]
+user = unquote(params.get("user", [None])[0])  # unquote декодирует %20 и т.п.
+password = unquote(params.get("pass", [None])[0])
 
 # Формируем строку для aiohttp_socks
 if user and password:

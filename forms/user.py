@@ -6,6 +6,7 @@ class Form(StatesGroup):
     age = State()
     gender = State()
 
-class sets(StatesGroup):
+
+class Sets(StatesGroup):
     set_weight = State()
     set_pressure = State()
