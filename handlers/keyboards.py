@@ -17,6 +17,7 @@ def get_main_reply_keyboard():
             [KeyboardButton(text="Мой вес"),
              KeyboardButton(text="Моё давление")],
             [KeyboardButton(text="Моя статистика")],
+            [KeyboardButton(text="Мой профиль")]
         ],
         resize_keyboard=True,
     )
@@ -72,5 +73,61 @@ def get_mypressure_inline_keyboard():
             [InlineKeyboardButton(text="На главную",
                                   callback_data="go_to_basic_menu")],
         ]
+    )
+    return keyboard
+
+
+def get_profile_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✏️ Имя", callback_data="edit:name"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="✏️ Пол", callback_data="edit:gender"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                text="На главную", callback_data="go_to_basic_menu"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="✏️ Возраст", callback_data="edit:age"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="✏️ Рост", callback_data="edit:height"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="✏️ Цель по весу", callback_data="edit:target"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                text="🔙 Назад", callback_data="go_to_basic_menu"
+             )
+             ]
+        ]
+    )
+    return keyboard
+
+def get_gender_keyboard():
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text="Женщина"),
+                KeyboardButton(text="Мужчина"),
+            ],
+            [KeyboardButton(text="Назад в профиль")]
+        ],
+        resize_keyboard=True,
     )
     return keyboard

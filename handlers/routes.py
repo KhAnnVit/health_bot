@@ -11,7 +11,7 @@ router = Router()
 # обработка команды start
 @router.message(Command("start"))
 async def cmd_start(message: Message):
-    await db.add_user(message.from_user.id, message.from_user.username)
+    await db.upsert_user(message.from_user.id, message.from_user.username)
     await message.answer(
         "👋 Привет! Я бот для отслеживания здоровья.\n\n" "Выбери, что хочешь сделать",
         reply_markup=kb.get_main_reply_keyboard(),
