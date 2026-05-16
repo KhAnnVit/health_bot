@@ -17,7 +17,8 @@ def get_main_reply_keyboard():
             [KeyboardButton(text="Мой вес"),
              KeyboardButton(text="Моё давление")],
             [KeyboardButton(text="Моя статистика")],
-            [KeyboardButton(text="Мой профиль")]
+            [KeyboardButton(text="Мой профиль")],
+            [KeyboardButton(text="Калькуляторы и тесты")]
         ],
         resize_keyboard=True,
     )
@@ -131,3 +132,46 @@ def get_gender_keyboard():
         resize_keyboard=True,
     )
     return keyboard
+
+def get_calculators_list_keyboard():
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Калькулятор ИМТ")],
+        ],
+        resize_keyboard=True,
+    )
+    return keyboard
+
+def get_bmi_inline_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Использовать данные из профиля", callback_data="bmi_from_profile")
+            ],
+            [
+                InlineKeyboardButton(text="Ввести даные вручную", callback_data="bmi_from_input")
+            ],
+            [
+                InlineKeyboardButton(text="Назад к списку", callback_data="go_to_calculators_list")
+            ]
+        ]
+    )
+    return keyboard
+
+def get_bmi_wrong_profile_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Заполнить профиль", callback_data="edit_profile")
+            ],
+            [
+                InlineKeyboardButton(text="Ввести даные вручную", callback_data="bmi_from_input")
+            ],
+            [
+                InlineKeyboardButton(text="Назад", callback_data="go_to_calculators_list")
+            ]
+        ]
+    )
+    return keyboard
+
+

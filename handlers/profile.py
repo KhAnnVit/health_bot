@@ -27,18 +27,27 @@ def format_profile(data: dict) -> str:
         f"⚖️ Текущий вес: <code>{current}</code>\n"
         f"🎯 Цель: <code>{target}</code>"
     )
-
+@router.message(F.text == "Заполнить профиль")
 @router.message(F.text == "Назад в профиль")
 @router.message(F.text == "Мой профиль")
-async def show_profile(event: Message, state: FSMContext):
+@router.callback_query(F.data == "edit_profile")
+async def show_profile(event: Message | CallbackQuery, state: FSMContext):
     await state.clear()
     profile = await db.get_profile(event.from_user.id)
-    if not profile:
-        await event.answer("⚠️ Профиль не найден. Нажми /start")
-        return
 
-    text = format_profile(profile)
-    await event.answer(text, reply_markup=kb.get_profile_keyboard())
+    if not profile:
+        text = "⚠️ Профиль не найден. Нажми /start"
+        markup = None
+    else:
+        text = format_profile(profile)
+        markup = kb.get_profile_keyboard()
+
+    # 🔑 Разделяем обработку CallbackQuery и Message
+    if isinstance(event, CallbackQuery):
+        await event.message.answer(text, reply_markup=markup)  # Отправка в чат
+        await event.answer()                                   # Убирает "часики" загрузки на кнопке
+    else:
+        await event.answer(text, reply_markup=markup)
 
 
 # ─── Callbacks на редактирование ───

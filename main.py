@@ -4,9 +4,19 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.client.session.aiohttp import AiohttpSession
+import logging
 
 from handlers import routes, weight, pressure, stats, profile
+from handlers.calculators import bmi
 import db
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
 
 # Подключаем роутеры
 dp = Dispatcher()
@@ -15,12 +25,13 @@ dp.include_router(weight.router)
 dp.include_router(pressure.router)
 dp.include_router(stats.router)
 dp.include_router(profile.router)
+dp.include_router(bmi.router)
 
 
 async def main():
     # 1. Инициализация БД
     await db.init_db()
-    print("🗄️ База данных подключена")
+    logger.info("🗄️ База данных подключена")
 
     # 2. Создание HTTP-сессии с прокси
     session = AiohttpSession(proxy=PROXY_URL)
@@ -29,27 +40,25 @@ async def main():
     bot = Bot(
         token=BOT_TOKEN,
         session=session,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML),  # ✅ Исправлено: было session_default
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
 
-    print("🤖 Бот запущен! Нажмите Ctrl+C для остановки.")
+    logger.info("🤖 Бот запущен!")
 
     try:
         # Запуск polling
         await dp.start_polling(bot)
 
     except (KeyboardInterrupt, SystemExit, asyncio.CancelledError):
-        # ✅ Ловим сигналы завершения БЕЗ создания нового event loop
-        print("\n👋 Получен сигнал остановки...")
+        logger.info("👋 Получен сигнал остановки...")
 
     finally:
-        # ✅ Закрываем ресурсы ВНУТРИ текущего event loop
         await db.close_db()
+        logger.info("🔌 Пул соединений закрыт")
         await bot.session.close()
         await bot.close()
-        print("✅ Бот корректно завершил работу.")
+        logger.info("✅ Бот корректно завершил работу.")
 
 
 if __name__ == "__main__":
-    # ✅ asyncio.run() вызывается ТОЛЬКО ОДИН РАЗ в точке входа
     asyncio.run(main())

@@ -2,7 +2,8 @@ import asyncpg
 from asyncpg import PostgresError
 from typing import Optional, Dict, Any, List
 from config import DATABASE_URL
-
+import logging
+logger = logging.getLogger(__name__)
 # Глобальный пул
 pool: Optional[asyncpg.Pool] = None
 
@@ -21,7 +22,7 @@ async def init_db():
             command_timeout=10,  # Макс. время выполнения запроса
             statement_cache_size=50  # Кэш планов запросов
         )
-        print("✅ Пул соединений создан")
+        logger.info("✅ Пул соединений создан")
     except Exception as e:
         raise RuntimeError(f"❌ Ошибка подключения к БД: {e}") from e
 
@@ -32,7 +33,7 @@ async def close_db():
     if pool:
         await pool.close()
         pool = None
-        print("🔌 Пул соединений закрыт")
+        logger.info("🔌 Пул соединений закрыт")
 
 
 def _check_pool():
@@ -139,15 +140,30 @@ async def get_profile(telegram_id: int) -> Optional[Dict[str, Any]]:
 
 
 async def update_profile_field(telegram_id: int, field: str, value) -> None:
-    """Безопасно обновляет одно поле профиля"""
+    """Безопасно обновляет одно поле профиля через явный маппинг"""
     _check_pool()
-    allowed_fields = {'full_name', 'gender', 'age', 'height_cm', 'target_weight_kg'}
-    if field not in allowed_fields:
-        raise ValueError(f"Недопустимое поле: {field}")
+
+    # Явное сопоставление: внешний ключ → имя колонки в БД
+    FIELD_TO_COLUMN = {
+        'full_name': 'full_name',
+        'gender': 'gender',
+        'age': 'age',
+        'height_cm': 'height_cm',
+        'target_weight_kg': 'target_weight_kg',
+    }
+
+    if field not in FIELD_TO_COLUMN:
+        raise ValueError(f"Недопустимое поле: {field}. Допустимые: {list(FIELD_TO_COLUMN.keys())}")
+
+    column = FIELD_TO_COLUMN[field]
 
     async with pool.acquire() as conn:
-        await conn.execute(
-            f"UPDATE users SET {field} = $2 WHERE telegram_id = $1",
-            telegram_id, value
-        )
+        try:
+            await conn.execute(
+                f"UPDATE users SET {column} = $2 WHERE telegram_id = $1",
+                telegram_id, value
+            )
+        except asyncpg.PostgresError as e:
+            logger.error(f"DB error updating {field} for user {telegram_id}: {e}")
+            raise RuntimeError("Ошибка обновления профиля")
 

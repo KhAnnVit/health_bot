@@ -4,6 +4,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 import handlers.keyboards as kb
 import db
+import utils.messages as msg
 
 router = Router()
 
@@ -26,3 +27,9 @@ async def basic(callback_query: CallbackQuery, state: FSMContext):
         "Выбери, что хочешь сделать", reply_markup=kb.get_main_reply_keyboard()
     )
     await state.clear()
+
+@router.callback_query(F.data == "go_to_basic_menu")
+@router.message(F.text == "Калькуляторы и тесты")
+async def get_calculators(event: Message, state: FSMContext):
+    text = 'Выберите калькулятор или тест из списка \n \n ⚠️ Важно: результаты калькуляторов — это ориентировочные оценки, а не медицинский диагноз. Для индивидуальных рекомендаций проконсультируйтесь с врачом или диетологом.'
+    await event.answer(text, reply_markup=kb.get_calculators_list_keyboard())
