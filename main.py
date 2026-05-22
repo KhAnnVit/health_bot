@@ -6,8 +6,8 @@ from aiogram.enums import ParseMode
 from aiogram.client.session.aiohttp import AiohttpSession
 import logging
 
-from handlers import routes, weight, pressure, stats, profile
-from handlers.calculators import bmi
+from handlers import routes, weight, pressure, stats, profile, errors
+from handlers.calculators import bmi, water
 import db
 
 logging.basicConfig(
@@ -26,6 +26,8 @@ dp.include_router(pressure.router)
 dp.include_router(stats.router)
 dp.include_router(profile.router)
 dp.include_router(bmi.router)
+dp.include_router(water.router)
+dp.include_router(errors.router)
 
 
 async def main():

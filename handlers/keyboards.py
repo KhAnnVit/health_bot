@@ -137,6 +137,7 @@ def get_calculators_list_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="Калькулятор ИМТ")],
+            [KeyboardButton(text="Калькулятор нормы воды")]
         ],
         resize_keyboard=True,
     )
