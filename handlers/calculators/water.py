@@ -1,25 +1,21 @@
-# handlers/calculators/water.py
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import Message
 import db
 import handlers.keyboards as kb
 
 router = Router()
 
-
-def calculate_water_norm(weight_kg: float, activity: str = "moderate") -> float:
-    """Норма воды в литрах в день"""
-    # Базовая формула: 30-40 мл на кг веса
+#функция для расчёта нормы воды
+def calculate_water_norm(weight_kg: float) -> float:
     base = weight_kg * 0.03  # 30 мл/кг
-    # Коэффициент активности
     return round(base, 1)
 
-
+#расчёт
 @router.message(F.text == "Калькулятор нормы воды")
 async def calc_water(message: Message):
     profile = await db.get_profile(message.from_user.id)
 
+    #на случай если не получится вытянуть данные из профиля
     if not profile or not profile.get('current_weight'):
         await message.answer(
             "⚠️ В профиле не указан текущий вес.\nВведите его вручную или обновите профиль.",
