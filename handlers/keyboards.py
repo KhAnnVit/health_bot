@@ -78,6 +78,7 @@ def get_mypressure_inline_keyboard():
     return keyboard
 
 
+#изменгение данных профиля
 def get_profile_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -120,6 +121,7 @@ def get_profile_keyboard():
     )
     return keyboard
 
+#выбор пола
 def get_gender_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -133,6 +135,7 @@ def get_gender_keyboard():
     )
     return keyboard
 
+#список калькуляторов
 def get_calculators_list_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -143,6 +146,7 @@ def get_calculators_list_keyboard():
     )
     return keyboard
 
+#клавиатура для выбора способа расчёта ИМТ
 def get_bmi_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -159,6 +163,7 @@ def get_bmi_inline_keyboard():
     )
     return keyboard
 
+#клавиатура на случай если при расчёте ИМТ не получилось взять данные из профиля
 def get_bmi_wrong_profile_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
